@@ -4,6 +4,10 @@ import BookItem from "./BookItem";
 import BookForm from "./BookForm";
 import { toast } from "react-hot-toast";
 
+import "../styles/Tables.css";
+import "../styles/Booklist.css";
+import "../styles/Buttons.css";
+
 const BookList = ({ role }) => {
   const [books, setBooks] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,12 +26,10 @@ const BookList = ({ role }) => {
 
   const handleDelete = async (isbn) => {
     try {
-      console.log(isbn);
       await deleteBook(role, isbn);
       toast.success("Book deleted successfully!");
       loadBooks();
     } catch (error) {
-      console.log(error);
       toast.error("Failed to delete book.");
     }
   };
@@ -36,20 +38,17 @@ const BookList = ({ role }) => {
     setBookToEdit(book);
     setShowForm(true);
   };
-  
+
   const handleRequestBook = async (isbn) => {
     if (isRequesting) return;
-    
     try {
       setIsRequesting(true);
-      await createRequest(role, {
-        ISBN: isbn,
-        ReqType: "issue"
-      });
+      await createRequest(role, { ISBN: isbn, ReqType: "issue" });
       toast.success("Book request submitted successfully!");
     } catch (error) {
-      console.log(error);
-      toast.error(error?.response?.data?.error||"Failed to submit book request.");
+      toast.error(
+        error?.response?.data?.error || "Failed to submit book request."
+      );
     } finally {
       setIsRequesting(false);
     }
@@ -57,17 +56,19 @@ const BookList = ({ role }) => {
 
   return (
     <div className="book-list">
-      <h2>Books</h2>
-      <input
-        type="text"
-        placeholder="Search books..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-      {role !== "reader" && (
-        <button onClick={() => setShowForm(true)}>Add Book</button>
-      )}
-
+      <div className="search-add">
+        <input
+          type="text"
+          placeholder="Search books..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        {role !== "reader" && (
+          <button className="add-btn" onClick={() => setShowForm(true)}>
+            Add Book
+          </button>
+        )}
+      </div>
       {showForm && (
         <BookForm
           role={role}
@@ -80,39 +81,46 @@ const BookList = ({ role }) => {
         />
       )}
 
-      <table>
-        <thead>
-          <tr>
-            <th>ISBN</th>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Publisher</th>
-            <th>Version</th>
-            <th>Total Copies</th>
-            <th>Available Copies</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {books
-            .filter((book) =>
-              book?.title.toLowerCase().includes(searchTerm.toLowerCase())
-            )
-            .map((book, index) => (
-              <BookItem
-                key={book.ISBN || `book-${index}`}
-                book={book}
-                role={role}
-                onEdit={handleEdit}
-                onDelete={() => {
-                  console.log(book);
-                  handleDelete(book.ISBN);
-                }}
-                onRequestBook={handleRequestBook}
-              />
-            ))}
-        </tbody>
-      </table>
+      <div className="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th className="mobile-hidden">ISBN</th>
+              <th className="mobile-show">Title</th>
+              <th className="mobile-hidden"  >Author</th>
+              <th className="mobile-hidden">Publisher</th>
+              <th className="mobile-hidden">Version</th>
+              <th className="mobile-hidden">Total Copies</th>
+              <th className="mobile-hidden">Available Copies</th>
+              <th className="mobile-hidden">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {books
+              .filter(
+                (book) =>
+                  book?.title
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase()) ||
+                  book?.authors
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase()) ||
+                  searchTerm.toLowerCase().includes(book?.ISBN.toString())
+              )
+              .sort((a, b) => a.ISBN - b.ISBN)
+              .map((book, index) => (
+                <BookItem
+                  key={book.ISBN || `book-${index}`}
+                  book={book}
+                  role={role}
+                  onEdit={handleEdit}
+                  onDelete={() => handleDelete(book.ISBN)}
+                  onRequestBook={handleRequestBook}
+                />
+              ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

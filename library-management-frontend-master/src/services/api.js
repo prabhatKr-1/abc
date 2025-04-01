@@ -1,6 +1,5 @@
 import axios from "axios";
-
-const API_BASE_URL = "http://localhost:8081/v1";
+const API_BASE_URL = "http://localhost:8080/v1";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -28,6 +27,7 @@ export const signup = async (userData) => {
 };
 export const logoutUser = async () => {
   const response = await api.get("/auth/logout");
+
   return response.data;
 };
 
@@ -39,12 +39,13 @@ export const fetchUsers = async (role) => {
 };
 
 export const addUser = async (role, _user) => {
+  // console.log(_user)
   let response;
   if (role === "admin") {
     response = await api.post(`${role}/create-reader`, _user);
   } else {
     response = await api.post(
-      `${role}/create-${_user.role.toLowerCase()}`,
+      `${role}/create-${_user.Role.toLowerCase()}`,
       _user
     );
   }
@@ -52,6 +53,7 @@ export const addUser = async (role, _user) => {
 };
 
 export const updateUser = async (role, _user) => {
+  // console.log(_user)
   const response = await api.patch(`${role}/users/`, _user);
   return response.data;
 };
@@ -90,7 +92,7 @@ export const deleteBook = async (role, id) => {
 
 export const fetchBorrowedBooks = async (role) => {
   const response = await api.get(`${role}/books/my`);
-  console.log(response);
+  // console.log(response);
   return response.data;
 };
 
@@ -102,7 +104,6 @@ export const fetchRequests = async (role) => {
   } else {
     response = await api.get(`${role}/requests/all`);
   }
-  console.log(response);
   return response.data;
 };
 

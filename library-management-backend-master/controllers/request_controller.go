@@ -131,12 +131,24 @@ func ListRequests(c *gin.Context) {
 }
 
 // HANDLING RETURN REQUEST
-func handleReturnRequest(c *gin.Context, returnapproverID, reqId uint) {
+func handleReturnRequest(c *gin.Context, returnapproverID, reqId uint, action string) {
 	var req models.RequestEvents
 	// FETCHING REQUEST DETAILS
 	if err := config.DB.First(&req, reqId).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
+		})
+		return
+	}
+
+	if action == "reject" {
+		if err := config.DB.Delete(&req).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Return request rejected successfully!",
 		})
 		return
 	}
@@ -207,7 +219,7 @@ func ProcessRequest(c *gin.Context) {
 
 	// HANDLING BOOK RETURNS
 	if input.Reqtype == "return" {
-		handleReturnRequest(c, ApproverID, input.ReqID)
+		handleReturnRequest(c, ApproverID, input.ReqID, input.Action)
 		return
 	}
 
@@ -218,7 +230,7 @@ func ProcessRequest(c *gin.Context) {
 		return
 	}
 
-	if input.Action == "reject" {
+	if input.Action == "reject" || input.Action == "Reject" {
 		// REMOVE ENTRY FROM REQUESTS TABLE
 		// if err := config.DB.Model(&models.RequestEvents{}).Delete(input.ReqID).Error; err != nil {
 		if err := config.DB.Where("req_id = ?", input.ReqID).Delete(&models.RequestEvents{}).Error; err != nil {

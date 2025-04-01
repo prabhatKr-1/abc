@@ -11,6 +11,7 @@ import toast, { Toaster } from "react-hot-toast";
 import OwnerDashboard from "./components/OwnerDashboard";
 import AdminDashboard from "./components/AdminDashboard";
 import ReaderDashboard from "./components/ReaderDashboard";
+import LandingPage from "./pages/LandingPage";
 
 export const AuthContext = createContext();
 
@@ -48,10 +49,8 @@ const App = () => {
     localStorage.removeItem("user");
 
     setUser(null);
-    toast.success("Logged out successfully");
   };
 
-  // ✅ Fix: Ensure `useMemo` runs before JSX is returned
   const authContextValue = useMemo(() => ({ user, setUser, logout }), [user]);
 
   if (loading) return <div>Loading...</div>;
@@ -63,10 +62,14 @@ const App = () => {
         <Routes>
           <Route
             path="/"
+            element={user ? <Navigate to="/dashboard" /> : <LandingPage />}
+          />
+          {/* <Route
+            path="/"
             element={
               user ? <Navigate to="/dashboard" /> : <Navigate to="/auth" />
             }
-          />
+          /> */}
           <Route path="/auth" element={<Auth />} />
           <Route
             path="/dashboard"

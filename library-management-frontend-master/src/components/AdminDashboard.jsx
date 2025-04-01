@@ -2,34 +2,37 @@ import { useState } from "react";
 import BookList from "./BookList";
 import UserList from "./UserList";
 import RequestList from "./RequestList";
-import { useAuth } from "../App";
-import Navbar from "./NavBar";
+import Navbar from "./Navbar";
+
+import "../styles/Buttons.css";
+import "../styles/Tables.css";
+import "../styles/Dashboard.css";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("books");
   return (
     <div className="dashboard">
       <Navbar />
-      <h2>Admin Dashboard</h2>
+      <h2 style={{ textAlign: "center" }}>Admin Dashboard</h2>
 
       <div className="tabs">
         <button
           onClick={() => setActiveTab("books")}
           className={activeTab === "books" ? "active" : ""}
         >
-          Books
+          <h2>Books</h2>
         </button>
         <button
           onClick={() => setActiveTab("users")}
           className={activeTab === "users" ? "active" : ""}
         >
-          Users
+          <h2>Users</h2>
         </button>
         <button
           onClick={() => setActiveTab("requests")}
           className={activeTab === "requests" ? "active" : ""}
         >
-          Requests
+          <h2>Requests</h2>
         </button>
       </div>
       <div className="tab-content">

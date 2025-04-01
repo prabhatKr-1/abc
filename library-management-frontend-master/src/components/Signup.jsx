@@ -3,20 +3,61 @@ import { useNavigate } from "react-router-dom";
 import { signup } from "../services/api";
 import toast from "react-hot-toast";
 
+import "../styles/Buttons.css";
+import "../styles/Tables.css";
+
 const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [libName, setLibName] = useState("");
   const [phone, setPhone] = useState("");
-
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
+  // Validation functions
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Standard email regex
+    return emailRegex.test(email);
+  };
+
+  const validatePhone = (phone) => {
+    const phoneRegex = /^\d{10}$/; // Ensures exactly 10 digits
+    return phoneRegex.test(phone);
+  };
+
+  const validatePassword = (password) => {
+    // Password must be at least 8 characters long, contain one uppercase letter, one lowercase letter,
+    // one number, and one special character
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return passwordRegex.test(password);
+  };
+
   const handleSignup = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    // Validate inputs
+    if (!validateEmail(email)) {
+      toast.error("Please enter a valid email address.");
+      setLoading(false);
+      return;
+    }
+    if (!validatePhone(phone)) {
+      toast.error("Please enter a valid 10-digit phone number.");
+      setLoading(false);
+      return;
+    }
+    if (!validatePassword(password)) {
+      toast.error(
+        "Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character."
+      );
+      setLoading(false);
+      return;
+    }
+
     try {
       const data = await signup({
         name,
@@ -37,7 +78,7 @@ const Signup = () => {
 
   return (
     <div className="auth-container">
-      <h2>Signup</h2>
+      <h2 style={{color:"rgb(36, 38, 162)"}}>Signup</h2>
       <form onSubmit={handleSignup}>
         <input
           type="text"

@@ -2,6 +2,10 @@ import { useState, useEffect, useContext } from "react";
 import { addBook, updateBook } from "../services/api";
 import { toast } from "react-hot-toast";
 
+import "../styles/Buttons.css";
+import "../styles/Tables.css";
+import "../styles/Forms.css"
+
 const BookForm = ({ role, bookToEdit, onBookSaved, onClose }) => {
   const [isbn, setISBN] = useState("");
   const [title, setTitle] = useState("");

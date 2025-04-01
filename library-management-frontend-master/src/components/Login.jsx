@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { login, setAuthToken } from "../services/api";
 import { AuthContext } from "../App";
 import toast from "react-hot-toast";
+
+import "../styles/Buttons.css";
+import "../styles/Tables.css";
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -10,15 +14,27 @@ const Login = () => {
   const navigate = useNavigate();
   const { setUser } = useContext(AuthContext);
 
+  // Email validation function using regex
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Common regex for email validation
+    return emailRegex.test(email);
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
 
+    // Validate the email before proceeding
+    if (!validateEmail(email)) {
+      toast.error("Please enter a valid email address.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await login({ email, password });
-
-      // Save only user_id and lib_id to localStorage
       localStorage.setItem("user", JSON.stringify(response.user));
+      setAuthToken(response.token);
       setUser(response.user);
       toast.success("Login successful");
       navigate("/dashboard");
@@ -32,7 +48,7 @@ const Login = () => {
 
   return (
     <div className="auth-container">
-      <h2>Login</h2>
+      <h2 style={{color:"rgb(36, 38, 162)"}}>Login</h2>
       <form onSubmit={handleLogin}>
         <input
           type="email"

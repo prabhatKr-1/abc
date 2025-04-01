@@ -3,6 +3,9 @@ import { fetchRequests, handleRequest } from "../services/api";
 import RequestItem from "./RequestItem";
 import { toast } from "react-hot-toast";
 
+import "../styles/Buttons.css";
+import "../styles/Tables.css";
+
 const RequestList = ({ role, userId }) => {
   const [requests, setRequests] = useState([]);
 
@@ -13,12 +16,13 @@ const RequestList = ({ role, userId }) => {
   const loadRequests = async () => {
     const response = await fetchRequests(role, userId);
     setRequests(response.requests);
-    console.log(response);
+    // console.log(response);
   };
   const handleAccept = async (request) => {
+    console.log(request);
     try {
       await handleRequest(role, {
-        reqID: request.reqID,
+        ReqID: request.reqID,
         ReqType: request.RequestType,
         Action: "approve",
       });
@@ -30,9 +34,10 @@ const RequestList = ({ role, userId }) => {
   };
 
   const handleReject = async (request) => {
+    console.log(request);
     try {
       await handleRequest(role, {
-        reqID: request.reqID,
+        ReqID: request.reqID,
         ReqType: request.RequestType,
         Action: "reject",
       });
@@ -45,28 +50,30 @@ const RequestList = ({ role, userId }) => {
 
   return (
     <div className="request-list">
-      <h2>Requests</h2>
+      {/* <h2>Requests</h2> */}
       <table>
         <thead>
           <tr>
-            <th>Request ID</th>
-            <th>Reader ID</th>
-            <th>ISBN</th>
-            <th>Request Type</th>
-            {role !== "reader" && <th>Actions</th>}
+            <th className="mobile-show">Request ID</th>
+            <th className="mobile-hidden">Reader ID</th>
+            <th className="mobile-hidden">ISBN</th>
+            <th className="mobile-hidden">Request Type</th>
+            {role !== "reader" && <th className="mobile-hidden">Actions</th>}
           </tr>
         </thead>
         <tbody>
           {requests?.length > 0 ? (
-            requests.map((request) => (
-              <RequestItem
-                key={request.reqID}
-                request={request}
-                role={role}
-                onAccept={handleAccept}
-                onReject={handleReject}
-              />
-            ))
+            requests
+              .sort((a, b) => a.reqID - b.reqID)
+              .map((request) => (
+                <RequestItem
+                  key={request.reqID}
+                  request={request}
+                  role={role}
+                  onAccept={handleAccept}
+                  onReject={handleReject}
+                />
+              ))
           ) : (
             <tr>
               <td colSpan="5">No requests available</td>

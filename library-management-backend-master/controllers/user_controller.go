@@ -2,6 +2,9 @@ package controllers
 
 import (
 	// "log"
+	// "fmt"
+	// "log"
+	"log"
 	"net/http"
 	"os"
 
@@ -64,7 +67,7 @@ func Login(c *gin.Context) {
 	// CHECKING IF USER EXISTS
 	var user models.User
 	if err := config.DB.Where("email = ?", input.Email).First(&user).Error; err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User not found"})
 		return
 	}
 	var lib models.Library
@@ -102,6 +105,7 @@ func Login(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Login successful",
+		"token":   token,
 		"user":    returnUser,
 	})
 }
@@ -268,8 +272,6 @@ func ListAllUsers(c *gin.Context) {
 
 // UPDATE USER DETAILS
 func UpdateUser(c *gin.Context) {
-	id := c.Param("id")
-	libid, _ := c.Get("libid")
 	role, _ := c.Get("role")
 
 	var input struct {
@@ -287,14 +289,16 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 	var user models.User
-	if err := config.DB.Where("lib_id = ?", libid).First(&user, id).Error; err != nil {
+	if err := config.DB.Where("email = ?", input.Email).First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	if (role == "Admin" && user.Role != "Reader") || role == "Reader" || (role == "Admin" && input.Role != "") {
+	if role == "Admin" && user.Role != "Reader" || (input.Role == "Admin" && role != "Owner") || (input.Role == "Owner" && role != "Owner") {
+		log.Println(role)
+		log.Println(input.Role)
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "Admin can't perform this operation!",
 		})
@@ -354,16 +358,18 @@ func DeleteUser(c *gin.Context) {
 		})
 		return
 	}
-	if (role == "admin" && user.Role != "reader") || role == "reader" {
+	if (role == "Admin" && user.Role != "Reader") || role == "Reader" || user.Role == "Owner" {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "Unauthorized!",
 		})
+		return
 	}
 
 	if err := config.DB.Delete(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error,
 		})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "User deleted successfully!",

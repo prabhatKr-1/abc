@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { fetchBorrowedBooks } from "../services/api";
 import IssuedBooksItem from "./IssuedBooksItem";
 
+import "../styles/Buttons.css";
+import "../styles/Tables.css";
+
 const BorrowedBooksList = ({ role }) => {
   const [borrowedBooks, setBorrowedBooks] = useState([]); // Initialize as an empty array
 
@@ -17,18 +20,19 @@ const BorrowedBooksList = ({ role }) => {
     };
 
     loadBorrowedBooks();
-  }, [role]);  
+  }, [role]);
 
   return (
     <div className="borrowed-books-list">
-      <h2>Borrowed Books</h2>
+      {/* <h2>Borrowed Books</h2> */}
       <table>
         <thead>
           <tr>
-            <th>ISBN</th>
-            <th>Return Date</th>
-            <th>Due Date</th>
-            {role !== "reader" && <th>Actions</th>}
+            <th className="mobile-show">ISBN</th>
+            <th className="mobile-hidden">Issue Date</th>
+            <th className="mobile-hidden">Due Date</th>
+            <th className="mobile-hidden">Status</th>
+            <th className="mobile-hidden">Actions</th>
           </tr>
         </thead>
         <tbody>

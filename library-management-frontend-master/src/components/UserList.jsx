@@ -1,8 +1,12 @@
 import { useState, useEffect } from "react";
-import { fetchUsers, deleteUser } from "../services/api";
+import { fetchUsers, updateUser, deleteUser } from "../services/api";
 import UserItem from "./UserItem";
 import UserForm from "./UserForm";
 import { toast } from "react-hot-toast";
+
+import "../styles/Buttons.css";
+import "../styles/Tables.css";
+import "../styles/Booklist.css";
 
 const UserList = ({ role }) => {
   const [users, setUsers] = useState([]);
@@ -36,7 +40,7 @@ const UserList = ({ role }) => {
 
   return (
     <div className="user-list">
-      <h2>Users</h2>
+      <div className="search-add">
       <input
         type="text"
         placeholder="Search users..."
@@ -46,7 +50,7 @@ const UserList = ({ role }) => {
       {(role === "admin" || role === "owner") && (
         <button onClick={() => setShowForm(true)}>Add User</button>
       )}
-
+</div>
       {showForm && (
         <UserForm
           role={role}
@@ -62,19 +66,19 @@ const UserList = ({ role }) => {
       <table>
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Contact</th>
-            <th>Role</th>
-            {role === "admin" && <th>Actions</th>}
+            <th className="mobile-hidden">ID</th>
+            <th className="mobile-show">Name</th>
+            <th className="mobile-hidden">Email</th>
+            <th className="mobile-hidden">Contact</th>
+            <th className="mobile-hidden">Role</th>
+            {(role === "admin" || role ==="owner") && <th className="mobile-hidden">Actions</th>}
           </tr>
         </thead>
         <tbody>
           {users
             .filter((user) =>
               user?.name.toLowerCase().includes(searchTerm.toLowerCase())
-            )
+            ).sort((a,b) => a.id-b.id)
             .map((user, index) => (
               <UserItem
                 key={user.id || `user-${index}`}

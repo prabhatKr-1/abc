@@ -21,7 +21,7 @@ func SetupRoutes(r *gin.Engine) {
 		owner.POST("/password", controllers.UpdatePassword)
 		owner.POST("/create-admin", controllers.CreateAdminUser)
 		owner.GET("/users", controllers.ListAllUsers)
-		owner.PATCH("/users", controllers.UpdateUser)
+		owner.PATCH("/users/", controllers.UpdateUser)
 		owner.DELETE("/users/:id", controllers.DeleteUser)
 		owner.POST("/create-reader", controllers.CreateReaderUser)
 		owner.GET("/books/search", controllers.SearchBook)
@@ -33,7 +33,7 @@ func SetupRoutes(r *gin.Engine) {
 		owner.GET("/books", controllers.ShowBooks)
 	}
 
-	admin := r.Group("v1/admin/").Use(middleware.AuthMiddleware(utils.ValidateJWT, "Admin", "Owner"))
+	admin := r.Group("v1/admin/").Use(middleware.AuthMiddleware(utils.ValidateJWT, "Admin"))
 	{
 		admin.POST("/password", controllers.UpdatePassword)
 		admin.POST("/create-reader", controllers.CreateReaderUser)
